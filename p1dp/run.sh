@@ -1,0 +1,1 @@
+python input.py $1 | clingo --verbose=0 | python3 output.py
