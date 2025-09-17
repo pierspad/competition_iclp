@@ -54,10 +54,11 @@ different_dir(DR1,DC1,DR2,DC2) :- dir(DR1,DC1), dir(DR2,DC2),  DC1!=DC2.
 
 cell(R,C) :- Nr(NR), Nc(NC), R=1..NR, C=1..NC.
 
-straight(R1,C1,R2,C2,R3,C3) :- dir(DR,DC), R2=R1+DR, C2=C1+DC, R3=R2+DR, C3=C2+DC.
-angled(R1,C1,R2,C2,R3,C3) :- dir(DR1,DC1), dir(DR2,DC2), different_dir(DR1,DC1,DR2,DC2).
+straight(R1,C1,R2,C2,R3,C3) :- cell(R1,C1), dir(DR,DC), R2=R1+DR, C2=C1+DC, R3=R2+DR, C3=C2+DC.
+angled(R1,C1,R2,C2,R3,C3) :- cell(R1,C1), dir(DR1,DC1), dir(DR2,DC2), different_dir(DR1,DC1,DR2,DC2), R2=R1+DR1, C2=C1+DC1, R3=R2+DR2, C3=C2+DC2.
 
-% VINCOLO 1
+
+% RICHIESTA 1
 %per ogni cerchio nero sceglie 2 fence che vanno dal buco nero ad una direzione intorno e
 {f(R,C,R1,C1) : dir(Rdir,Cdir), R1=R+Rdir, C1=C+Cdir} = 2 :- b(R,C).
 %elimina tutti gli AS in cui le fence che passano sul cerchio nero non fanno angolo retto
@@ -66,23 +67,19 @@ angled(R1,C1,R2,C2,R3,C3) :- dir(DR1,DC1), dir(DR2,DC2), different_dir(DR1,DC1,D
 f(R1,C1,R2,C2) :- dir(Rdir,Cdir), b(R,C), f(R,C,R1,C1), R1=R+Rdir, C1=C+Cdir, R2=R1+Rdir, C2=C1+Cdir. 
 
 
-% VINCOLO 2
+% RICHIESTA 2
 %per ogni cerchio bianco sceglie 2 fence che vanno dal buco bianco ad una direzione intorno e
 {f(R,C,R1,C1) : dir(Rdir,Cdir), R1=R+Rdir, C1=C+Cdir} = 2 :- w(R,C).
-%elimina tutti gli AS in cui le fence intorno al cerchio bianco fanno angolo retto
-:- f(R,C,R1,C1), f(R,C,R2,C2), w(R1,C1), !straight(R1,C1,R,C,R2,C2).
+%elimina tutti gli AS in cui le fence intorno sul cerchio bianco fanno angolo retto
+:- f(R,C,R1,C1), f(R,C,R2,C2), w(R1,C1), angled(R1,C1,R,C,R3,C3). 
+% i due segmenti successivi devono continuare in linea retta
+f(R1,C1,R2,C2) :- w(R,C), f(R,C,R1,C1), angled(R,C,R1,C1,R2,C2), R+Rdir, C1=C+Cdir, R2=R1+Rdir, C2=C1+Cdir. 
+
 
 % VINCOLO 3
-%per ogni outpost sceglie 4 fence che vanno dal outpost ad una direzione intorno e
-
-
-o(3,2,10) 
-
 f(R,C) :- f(R,C,_,_)
 f(R,C) :- f(_,_,R,C) 
 
-o(R,C,V) :- f(R1,C1), f(R2,C2), f(R3,C3), f(R4,C4), 
-DiffR1 = R
 
 
 
